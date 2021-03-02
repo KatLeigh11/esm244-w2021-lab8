@@ -86,7 +86,7 @@ number_est
 #### Create a complete, scaled version of the data
 
 We're still going to use 3 clusters and see how it does, though there may be a case here for 2 given that Adelie & chinstrap penguins are pretty similar. 
-We are going to do this with *complete cases* - in other words, for the variables we're using to perform k-means clustering on penguins (bill length, bill depth, flipper length, body mass), we are *dropping any observation (row) where any of those are missing*. Keep in mind that this may not be the best option for every scenario - in other cases (e.g. when we have a large proportion of missingness), we may want to impute missing values instead.
+We are going to do this with *complete cases* - in other words, for the variables we're using to perform k-means clustering on penguins (bill length, bill depth, flipper length, body mass), we are *dropping any observation (row) where any of those are  missing*. Keep in mind that this may not be the best option for every scenario - in other cases (e.g. when we have a large proportion of missingness), we may want to impute missing values instead.
 
 ```{r}
 # Drop rows where any of the four size measurements are missing
@@ -116,7 +116,7 @@ Check out the outputs in `penguins_km`:
 penguins_km$size # How many observations assigned to each cluster
 penguins_km$cluster # What cluster each observation in penguins_scale is assigned to
 
-# Bind the cluster number to the original data used for clustering, so that we can see what cluster each penguin is assigned to
+# Bind the cluster number to the original data used for clustering, so that we can see what cluster each penguin is assigned to (SUPER USEFUL SYNTAX TO ASSOCIATE THINGS FROM DIFF DFs TOGETHER!!!)
 penguins_cl <- data.frame(penguins_complete, cluster_no = factor(penguins_km$cluster))
 
 # Plot flipper length versus body mass, indicating which cluster each penguin is assigned to (but also showing the actual species):
@@ -128,10 +128,11 @@ ggplot(penguins_cl) +
 
 # On your own: do the same, plotting bill dimensions and mapping species & cluster number to the point shape and color aesthetics:
 
-# MAKE
-# YOUR 
-# GRAPH 
-# HERE
+ggplot(penguins_cl) +
+  geom_point(aes(x = bill_length_mm, 
+                 y = bill_depth_mm, 
+                 color = cluster_no,
+                 shape = species))
 
 ```
 
@@ -142,7 +143,7 @@ We see that a lot of gentoos are in Cluster 3, a lot of Adelies are in Cluster 2
 ```{r}
 # Find the counts of each species assigned to each cluster, then pivot_wider() to make it a contingency table:
 penguins_cl %>% 
-  count(species, cluster_no) %>% 
+  count(species, cluster_no) %>% # spec w/in each clust
   pivot_wider(names_from = cluster_no, values_from = n) %>% 
   rename('Cluster 1' = '1', 'Cluster 2' = '2', 'Cluster 3' = '3')
 
@@ -186,13 +187,13 @@ wb_scaled <- wb_ghg_20 %>%
   scale()
   
 
-# Update to add rownames (country name) from wb_ghg_20
+# Update to add rownames (country name) from wb_ghg_20 (interesting way to have your data listed)
 rownames(wb_scaled) <- wb_ghg_20$name
 
 # Check the outcome with View(wb_scaled) - see that the rownames are now the country name (this is useful for visualizing)
 ```
 
-Great, now we have a simplified, scaled version of the numeric variables, with rownames containing the county name. 
+Great, now we have a simplified, scaled version of the numeric variables, with rownames containing the country name. 
 
 #### Find the Euclidean distances
 
